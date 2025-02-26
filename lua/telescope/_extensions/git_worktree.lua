@@ -157,13 +157,13 @@ local create_input_prompt = function(opts, cb)
 
     local re = string.format('git branch --remotes --list %s', opts.branch)
     local remote_branch = vim.fn.systemlist(re)
-    if #remote_branch == 1 then
+    if #remote_branch == 0 then
         cb(path, nil)
         return
     end
 
-    local confirmed = vim.fn.input('Track an upstream? [y/n]: ')
-    if string.sub(string.lower(confirmed), 0, 1) == 'y' then
+    local confirmed = vim.fn.input('Track upstream (default yes)? [y/n]: ')
+    if string.sub(string.lower(confirmed), 0, 1) == 'y' or confirmed == '' then
         opts.attach_mappings = function()
             actions.select_default:replace(function(prompt_bufnr, _)
                 local selected_entry = action_state.get_selected_entry()
@@ -305,7 +305,7 @@ local telescope_git_worktree = function(opts)
             attach_mappings = function(_, map)
                 action_set.select:replace(switch_worktree)
 
-                map('i', '<m-c>', function()
+                map('i', '<c-c>', function()
                     telescope_create_worktree {}
                 end)
                 map('n', '<m-c>', function()
